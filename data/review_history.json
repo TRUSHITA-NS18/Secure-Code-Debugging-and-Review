@@ -1,0 +1,262 @@
+[
+  {
+    "project": "Demo ECU Module",
+    "reviewer": "Local Reviewer",
+    "filename": "pasted_code.c",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nchar *password = \"demo-only-secret-123\";\n\nint process_input(char *user_input) {\n    char buffer[8];\n    strcpy(buffer, user_input);  // candidate unbounded copy\n    system(user_input);          // candidate command injection surface\n    int values[2] = {10, 20};\n    int result = values[4];      // candidate out-of-bounds access\n    // TODO: validate input and handle errors\n    FILE *fp = fopen(\"example.txt\", \"r\");\n    return result;\n}\n",
+    "findings": [
+      {
+        "severity": "High",
+        "rule_id": "SEC-001",
+        "title": "Possible hard-coded secret",
+        "file": "pasted_code.c",
+        "line": 5,
+        "evidence": "char *password = \"demo-only-secret-123\";",
+        "rationale": "A credential-like value appears embedded in source.",
+        "recommendation": "Remove it, rotate it if real, and use approved secret management.",
+        "status": "Open"
+      },
+      {
+        "severity": "Medium",
+        "rule_id": "PTR-001",
+        "title": "Potential pointer-safety review",
+        "file": "pasted_code.c",
+        "line": 5,
+        "evidence": "char *password = \"demo-only-secret-123\";",
+        "rationale": "Pointer-sensitive operation detected; this pattern does not prove a defect.",
+        "recommendation": "Trace pointer initialization/lifetime and check nullable pointers where appropriate.",
+        "status": "Open"
+      },
+      {
+        "severity": "Medium",
+        "rule_id": "MEM-002",
+        "title": "Potential indexed array access",
+        "file": "pasted_code.c",
+        "line": 8,
+        "evidence": "char buffer[8];",
+        "rationale": "Indexed access detected; the index may need bounds validation.",
+        "recommendation": "Validate index ranges before access and test boundary cases.",
+        "status": "Open"
+      },
+      {
+        "severity": "Medium",
+        "rule_id": "MEM-001",
+        "title": "Potential unbounded string operation",
+        "file": "pasted_code.c",
+        "line": 9,
+        "evidence": "strcpy(buffer, user_input);  // candidate unbounded copy",
+        "rationale": "This API may not enforce destination capacity.",
+        "recommendation": "Use bounded operations and explicit size checks; test truncation and boundary behavior.",
+        "status": "Open"
+      },
+      {
+        "severity": "High",
+        "rule_id": "SEC-002",
+        "title": "Potential command injection surface",
+        "file": "pasted_code.c",
+        "line": 10,
+        "evidence": "system(user_input);          // candidate command injection surface",
+        "rationale": "Command execution can be unsafe if arguments contain untrusted input.",
+        "recommendation": "Avoid shell command construction; use safe argument APIs and validate inputs.",
+        "status": "Open"
+      },
+      {
+        "severity": "Medium",
+        "rule_id": "MEM-002",
+        "title": "Potential indexed array access",
+        "file": "pasted_code.c",
+        "line": 11,
+        "evidence": "int values[2] = {10, 20};",
+        "rationale": "Indexed access detected; the index may need bounds validation.",
+        "recommendation": "Validate index ranges before access and test boundary cases.",
+        "status": "Open"
+      },
+      {
+        "severity": "Medium",
+        "rule_id": "MEM-002",
+        "title": "Potential indexed array access",
+        "file": "pasted_code.c",
+        "line": 12,
+        "evidence": "int result = values[4];      // candidate out-of-bounds access",
+        "rationale": "Indexed access detected; the index may need bounds validation.",
+        "recommendation": "Validate index ranges before access and test boundary cases.",
+        "status": "Open"
+      },
+      {
+        "severity": "Medium",
+        "rule_id": "PTR-001",
+        "title": "Potential pointer-safety review",
+        "file": "pasted_code.c",
+        "line": 14,
+        "evidence": "FILE *fp = fopen(\"example.txt\", \"r\");",
+        "rationale": "Pointer-sensitive operation detected; this pattern does not prove a defect.",
+        "recommendation": "Trace pointer initialization/lifetime and check nullable pointers where appropriate.",
+        "status": "Open"
+      },
+      {
+        "severity": "Low",
+        "rule_id": "RES-001",
+        "title": "Resource cleanup review",
+        "file": "pasted_code.c",
+        "line": 14,
+        "evidence": "FILE *fp = fopen(\"example.txt\", \"r\");",
+        "rationale": "Resource acquisition detected; cleanup on all paths needs review.",
+        "recommendation": "Check success and error paths for matching cleanup and clear ownership.",
+        "status": "Open"
+      }
+    ],
+    "guidance": [
+      {
+        "title": "# Input validation and bounds",
+        "excerpt": "# Input validation and bounds\nValidate external input at trust boundaries. Check array indexes and buffer lengths before access. Test zero, minimum, maximum, and over-maximum values.",
+        "source": "data\\guidelines\\secure_coding_baseline.md"
+      },
+      {
+        "title": "# Pointer and resource lifetime",
+        "excerpt": "# Pointer and resource lifetime\nDefine pointer ownership and lifetime. Check API return values and validate nullable pointers before dereference. Pair resource acquisition with cleanup on success and error paths.",
+        "source": "data\\guidelines\\secure_coding_baseline.md"
+      },
+      {
+        "title": "# Defensive error handling",
+        "excerpt": "# Defensive error handling\nHandle errors explicitly and do not ignore return codes from safety-relevant operations.",
+        "source": "data\\guidelines\\secure_coding_baseline.md"
+      },
+      {
+        "title": "# Command execution",
+        "excerpt": "# Command execution\nAvoid shell command construction with untrusted input. Prefer argument APIs, allowlists, and avoiding shell invocation where possible.",
+        "source": "data\\guidelines\\secure_coding_baseline.md"
+      }
+    ],
+    "timestamp": "2026-10-15T14:48:18+00:00"
+  },
+  {
+    "project": "Demo ECU Module",
+    "reviewer": "Local Reviewer",
+    "filename": "pasted_code.c",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nchar *password = \"demo-only-secret-123\";\n\nint process_input(char *user_input) {\n    char buffer[8];\n    strcpy(buffer, user_input);  // candidate unbounded copy\n    system(user_input);          // candidate command injection surface\n    int values[2] = {10, 20};\n    int result = values[4];      // candidate out-of-bounds access\n    // TODO: validate input and handle errors\n    FILE *fp = fopen(\"example.txt\", \"r\");\n    return result;\n}\n",
+    "findings": [
+      {
+        "severity": "High",
+        "rule_id": "SEC-001",
+        "title": "Possible hard-coded secret",
+        "file": "pasted_code.c",
+        "line": 5,
+        "evidence": "char *password = \"demo-only-secret-123\";",
+        "rationale": "A credential-like value appears embedded in source.",
+        "recommendation": "Remove it, rotate it if real, and use approved secret management.",
+        "status": "Open"
+      },
+      {
+        "severity": "Medium",
+        "rule_id": "PTR-001",
+        "title": "Potential pointer-safety review",
+        "file": "pasted_code.c",
+        "line": 5,
+        "evidence": "char *password = \"demo-only-secret-123\";",
+        "rationale": "Pointer-sensitive operation detected; this pattern does not prove a defect.",
+        "recommendation": "Trace pointer initialization/lifetime and check nullable pointers where appropriate.",
+        "status": "Open"
+      },
+      {
+        "severity": "Medium",
+        "rule_id": "MEM-002",
+        "title": "Potential indexed array access",
+        "file": "pasted_code.c",
+        "line": 8,
+        "evidence": "char buffer[8];",
+        "rationale": "Indexed access detected; the index may need bounds validation.",
+        "recommendation": "Validate index ranges before access and test boundary cases.",
+        "status": "Open"
+      },
+      {
+        "severity": "Medium",
+        "rule_id": "MEM-001",
+        "title": "Potential unbounded string operation",
+        "file": "pasted_code.c",
+        "line": 9,
+        "evidence": "strcpy(buffer, user_input);  // candidate unbounded copy",
+        "rationale": "This API may not enforce destination capacity.",
+        "recommendation": "Use bounded operations and explicit size checks; test truncation and boundary behavior.",
+        "status": "Open"
+      },
+      {
+        "severity": "High",
+        "rule_id": "SEC-002",
+        "title": "Potential command injection surface",
+        "file": "pasted_code.c",
+        "line": 10,
+        "evidence": "system(user_input);          // candidate command injection surface",
+        "rationale": "Command execution can be unsafe if arguments contain untrusted input.",
+        "recommendation": "Avoid shell command construction; use safe argument APIs and validate inputs.",
+        "status": "Open"
+      },
+      {
+        "severity": "Medium",
+        "rule_id": "MEM-002",
+        "title": "Potential indexed array access",
+        "file": "pasted_code.c",
+        "line": 11,
+        "evidence": "int values[2] = {10, 20};",
+        "rationale": "Indexed access detected; the index may need bounds validation.",
+        "recommendation": "Validate index ranges before access and test boundary cases.",
+        "status": "Open"
+      },
+      {
+        "severity": "Medium",
+        "rule_id": "MEM-002",
+        "title": "Potential indexed array access",
+        "file": "pasted_code.c",
+        "line": 12,
+        "evidence": "int result = values[4];      // candidate out-of-bounds access",
+        "rationale": "Indexed access detected; the index may need bounds validation.",
+        "recommendation": "Validate index ranges before access and test boundary cases.",
+        "status": "Open"
+      },
+      {
+        "severity": "Medium",
+        "rule_id": "PTR-001",
+        "title": "Potential pointer-safety review",
+        "file": "pasted_code.c",
+        "line": 14,
+        "evidence": "FILE *fp = fopen(\"example.txt\", \"r\");",
+        "rationale": "Pointer-sensitive operation detected; this pattern does not prove a defect.",
+        "recommendation": "Trace pointer initialization/lifetime and check nullable pointers where appropriate.",
+        "status": "Open"
+      },
+      {
+        "severity": "Low",
+        "rule_id": "RES-001",
+        "title": "Resource cleanup review",
+        "file": "pasted_code.c",
+        "line": 14,
+        "evidence": "FILE *fp = fopen(\"example.txt\", \"r\");",
+        "rationale": "Resource acquisition detected; cleanup on all paths needs review.",
+        "recommendation": "Check success and error paths for matching cleanup and clear ownership.",
+        "status": "Open"
+      }
+    ],
+    "guidance": [
+      {
+        "title": "# Input validation and bounds",
+        "excerpt": "# Input validation and bounds\nValidate external input at trust boundaries. Check array indexes and buffer lengths before access. Test zero, minimum, maximum, and over-maximum values.",
+        "source": "data\\guidelines\\secure_coding_baseline.md"
+      },
+      {
+        "title": "# Pointer and resource lifetime",
+        "excerpt": "# Pointer and resource lifetime\nDefine pointer ownership and lifetime. Check API return values and validate nullable pointers before dereference. Pair resource acquisition with cleanup on success and error paths.",
+        "source": "data\\guidelines\\secure_coding_baseline.md"
+      },
+      {
+        "title": "# Defensive error handling",
+        "excerpt": "# Defensive error handling\nHandle errors explicitly and do not ignore return codes from safety-relevant operations.",
+        "source": "data\\guidelines\\secure_coding_baseline.md"
+      },
+      {
+        "title": "# Command execution",
+        "excerpt": "# Command execution\nAvoid shell command construction with untrusted input. Prefer argument APIs, allowlists, and avoiding shell invocation where possible.",
+        "source": "data\\guidelines\\secure_coding_baseline.md"
+      }
+    ],
+    "timestamp": "2026-10-15T14:49:16+00:00"
+  }
+]
